@@ -8,6 +8,7 @@ include './connection.php';
     </head>
     <body>
         <?php
+			// all categories with the count of their products
             $sql = "SELECT * FROM category ";
             $query = mysqli_query($connection, $sql);
             while( $row = mysqli_fetch_assoc( $query ) ) {
@@ -18,6 +19,8 @@ include './connection.php';
                 echo 'Products - '.$row1['Productcounts'].'<br>';
             }
             echo '<hr>';
+			
+			// all products with their categories
             $sql2 = "SELECT * FROM product";
             $query2 = mysqli_query($connection, $sql2);
             while($row2 = mysqli_fetch_assoc($query2)){
