@@ -1,41 +1,24 @@
 <?php
 include './connection.php';
-?>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>RG</title>
-    </head>
-    <body>
-        <?php
-			// all categories with the count of their products
-            $sql = "SELECT * FROM category ";
-            $query = mysqli_query($connection, $sql);
-            while( $row = mysqli_fetch_assoc( $query ) ) {
-                echo 'Category - '.$row['title'].'<br>';
-                $sql1 = "SELECT COUNT(*) as `Productcounts` FROM product2category WHERE CategoryId=$row[id]";
-                $query1 = mysqli_query($connection, $sql1);
-                $row1= mysqli_fetch_assoc($query1);
-                echo 'Products - '.$row1['Productcounts'].'<br>';
-            }
-            echo '<hr>';
-			
-			// all products with their categories
-            $sql2 = "SELECT * FROM product";
-            $query2 = mysqli_query($connection, $sql2);
-            while($row2 = mysqli_fetch_assoc($query2)){
-                echo 'Product - '. $row2['title'].' <br> ';
-                echo 'price - '.$row2['price'].'<br>'; 
-                $sql3 = "SELECT * FROM product2category WHERE productid = $row2[id]";
-                $query3 = mysqli_query($connection, $sql3);
-                    while($row3 = mysqli_fetch_assoc($query3)){
-                        $sql4 = "SELECT * FROM category WHERE id = $row3[CategoryId]";
-                        $query4 = mysqli_query($connection, $sql4);
-                        $row4 = mysqli_fetch_assoc($query4);
-                        echo  $row4['title'].'<br>';
-                    }
-             echo '<hr>';
-             }
-            ?>
-    </body>
-</html>
+
+$sql = "SELECT p.id as `ProdID`,c.id as `CatID`, c.title as `CatTitle`,p.title as `ProdTitle`,p.price as `Price`
+        FROM category as c
+        INNER JOIN product2category as pc on pc.categoryid = c.id
+        INNER JOIN product as p ON p.id = pc.productid";
+$query = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($query)){
+    $data[$row['ProdID']]['ProdTitle'] = $row['ProdTitle'];
+    $data[$row['ProdID']]['Price'] = $row['Price'];
+    $data[$row['ProdID']]['categories'][$row['CatID']] = $row['CatTitle'];
+}
+echo '<table border="1"><tr><td>Products</td><td>Categories</td><td>Price</td></tr>';
+foreach ($data as $value) {
+    $ar = array();
+    echo '<tr><td>' . $value['ProdTitle'] . '</td>';
+    foreach ($value['categories'] as $v) {
+        $ar[] = $v;
+    }
+        echo '<td>'.implode(',', $ar) . '</td>';
+    echo '<td>'.$value['Price'].'</td></tr>';
+}
+echo '</table>';
